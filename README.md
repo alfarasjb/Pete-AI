@@ -89,9 +89,9 @@ With your virtual environment activated, install the required Python packages us
 #### Obtain and Set Up ngrok
 
 - Download and install ngrok from [ngrok's website](https://ngrok.com/download).
-- Start ngrok with the following command to expose port 3000:
+- Start ngrok with the following command to expose port 8080:
   ```bash
-  ngrok http 3000
+  ngrok http 8080
   ```
 - Note the https URL that ngrok provides. You will need this URL to configure Slack to send events to your local machine.
 - You can set the `--subdomain` argument to pass in a different subdomain if you're using a paid version of Ngrok.
