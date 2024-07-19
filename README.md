@@ -1,5 +1,6 @@
 # Pete-AI
 ## Pete-AI is a customer service agent for PioneerDev.AI 
+### [Video Demo](https://youtu.be/WTD1-7IpihA) 
 
 ### Setting up LLM Server
 
