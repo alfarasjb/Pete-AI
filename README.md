@@ -68,9 +68,12 @@ With your virtual environment activated, install the required Python packages us
 - Navigate to **AI Agents**, and click **Add Agent**
   - Select **Connect Your Own Agent**  
   - You can rename the Agent, and choose a voice. 
-  - Note down the **Agent ID**. This needed for the environment variable: `RETELL_AGENT_ID` later.
-  - Under **Custom LLM URL**, paste the LLM websocket url.
-    - Using ngrok: `wss://abcd-12-34-56-789.ngrok.io/llm-websocket` (See **Obtain and Set Up ngrok**)
+  - Note down the **Agent ID**. 
+    - This needed for the environment variable: `RETELL_AGENT_ID` later. 
+    - Agent ID will be specified when using Twilio calls. 
+  - Under **Custom LLM URL**, paste the LLM websocket url with `/llm-websocket` appended to the base URL.
+    - Using ngrok: `wss://abcd-12-34-56-789.ngrok.io/llm-websocket` (See **Obtain and Set Up ngrok**) 
+    - Using fly: `wss://pete-ai.fly.dev/llm-websocket`
 
 #### Set Up Environment Variables
 
@@ -100,6 +103,9 @@ With your virtual environment activated, install the required Python packages us
   uvicorn main:app --host 0.0.0.0 --port 8080
   ```
 #### Testing on the Dashboard 
-- Go to your RetellAI Dashboard and select your AI Agent. 
+- Go to your RetellAI Dashboard and select your AI Agent.
+  - For testing on the dashboard, we have to specify a voice. 
+  - Click the Voice Name under **Agent ID**. 
+  - Select **Echo** (Or you may choose any voice)
 - Click **Test Audio**. 
 - You can now talk to your agent.
