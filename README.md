@@ -109,3 +109,4 @@ With your virtual environment activated, install the required Python packages us
   - Select **Echo** (Or you may choose any voice)
 - Click **Test Audio**. 
 - You can now talk to your agent.
+![image](https://github.com/user-attachments/assets/fe1285fd-d846-4b13-affb-86753267d82e)
