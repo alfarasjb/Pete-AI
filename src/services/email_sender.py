@@ -1,19 +1,17 @@
 import requests
 
 
-class Email:
-    def __init__(self):
-        self.url = ''
+def send_email(name: str, message: str):
+    url = 'https://formspree.io/f/xvgpzpdd'  # Replace with your form endpoint URL
+    data = {
+        'name': name,
+        'message': message
+    }
+    print(f"Send Email")
+    # response = requests.post(url, data=data)
 
-    def send_email(self, name: str, email_address: str, message: str):
-        data = {
-            "name": name,
-            "email": email_address,
-            "message": message
-        }
-
-        response = requests.post(self.url, data=data)
-        print(response.status_code)
-
-if __name__ == "__main__":
-    service = Email()
+    # if response.status_code == 200:
+    #     print("Form submitted successfully!")
+    # else:
+    #     print(f"Failed to submit form. Status code: {response.status_code}")
+    #     print(f"Response: {response.text}")

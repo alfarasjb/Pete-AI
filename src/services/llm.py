@@ -5,12 +5,15 @@ from openai import AsyncOpenAI
 
 from src.definitions.credentials import Credentials, EnvVariables
 from src.prompts.prompts import BEGIN_SENTENCE, SYSTEM_PROMPT
+from src.services.email_sender import send_email
 from src.utils.custom_types import (
     ResponseRequiredRequest,
     ResponseResponse,
     Utterance
 )
 from src.utils.llm_functions import LLMFunctions
+
+# TODO: Make function calling more robust
 
 
 class LLMClient:
@@ -64,7 +67,7 @@ class LLMClient:
             self, request: ResponseRequiredRequest
     ) -> ResponseResponse:
         prompt = self.prepare_prompt(request)
-        func_call = {}
+        func_call = None
         func_arguments = ""
 
         stream = await self.client.chat.completions.create(
@@ -111,6 +114,21 @@ class LLMClient:
                     content_complete=True,
                     end_call=True
                 )
+                yield response
+            elif func_call['func_name'] == 'send_inquiry':
+                func_call['arguments'] = json.loads(func_arguments)
+                response = ResponseResponse(
+                    response_id=request.response_id,
+                    content=func_call['arguments']['message'],
+                    content_complete=True,
+                    end_call=False
+                )
+                is_complete = func_call['arguments']['is_complete']
+                print(f"Is complete: {is_complete}")
+                if int(is_complete):
+                    user_name = func_call['arguments']['user_name']
+                    user_message = func_call['arguments']['user_message']
+                    send_email(name=user_name, message=user_message)
                 yield response
         else:
         # Send final response with "content_complete" set to True to signal completion
