@@ -7,9 +7,12 @@ from typing import Dict, Any
 
 @dataclass
 class LLMFunctionProperty:
-    property_name: str
     property_type: str
     property_description: str
+
+    def as_json(self):
+        values = dict(type=self.property_type, description=self.property_description)
+        return json.dumps(values, indent=4)
 
 
 @dataclass
@@ -29,9 +32,8 @@ END_CALL_FUNCTION = LLMFunction(
     name="end_call",
     description="End the call only when the user explicitly requests it.",
     properties={
-        "message": {
-            "type": "string",
-            "description": "The message you will say before ending the call with the customer."
-        }
+        "message": LLMFunctionProperty(
+            property_type="string",
+            property_description="The message you will say before ending the call with the customer.")
     }
 ).as_json()
