@@ -1,6 +1,6 @@
 import json
 from dataclasses import dataclass
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 # TODO
 
@@ -10,30 +10,40 @@ class LLMFunctionProperty:
     property_type: str
     property_description: str
 
-    def as_json(self):
+    def as_dict(self):
         values = dict(type=self.property_type, description=self.property_description)
-        return json.dumps(values, indent=4)
+        return values
 
 
 @dataclass
-class LLMFunction:
+class LLMFunctionTemplate:
     name: str
     description: str
     properties: Dict[str, Any]
 
-    def as_json(self):
+    def as_dict(self) -> Dict[str, Any]:
         parameters = dict(type="object", properties=self.properties, required=list(self.properties.keys()))
         func = dict(name=self.name, description=self.description, parameters=parameters)
-        return json.dumps(dict(type="function", function=func), indent=4)
+        return dict(type="function", function=func)
 
 
-# CALL THIS LATER
-END_CALL_FUNCTION = LLMFunction(
-    name="end_call",
-    description="End the call only when the user explicitly requests it.",
-    properties={
-        "message": LLMFunctionProperty(
-            property_type="string",
-            property_description="The message you will say before ending the call with the customer.")
-    }
-).as_json()
+class LLMFunctions:
+
+    @classmethod
+    def _end_call_function(cls) -> Dict[str, Any]:
+        return LLMFunctionTemplate(
+            name="end_call",
+            description="End the call only when the user explicitly requests it.",
+            properties={
+                "message": LLMFunctionProperty(
+                    property_type="string",
+                    property_description="The message you will say before ending the call with the customer.").as_dict()
+            }
+        ).as_dict()
+
+    @classmethod
+    def functions(cls) -> List[Dict[str, Any]]:
+        return [
+            cls._end_call_function(),
+            # Add more functions here
+        ]
