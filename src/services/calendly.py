@@ -1,12 +1,15 @@
 import requests
 import json
 from typing import Dict, List
+import logging
 
 from src.definitions.credentials import Credentials
 
 # NOTE: Calendly does not have an endpoint to support scheduling events.
 # Must use a different option
 # https://developer.calendly.com/frequently-asked-questions
+
+logger = logging.getLogger(__name__)
 
 
 class Calendly:
@@ -72,5 +75,5 @@ class Calendly:
             return False
         self.last_recorded_meeting_date = meeting_date
         self.last_recorded_customer_name = customer_name
-        print(f"Setting calendly meeting for: {customer_name} on {meeting_date}")
+        logger.info(f"Setting calendly meeting for: {customer_name} on {meeting_date}")
         return True
