@@ -59,9 +59,10 @@ class GoogleAPI:
     def create_meeting(self, meeting_start: str, meeting_end: str):
         # Time format: ISO 8601
         # Check for conflicts
-        # conflicts = self.existing_events(meeting_start)
-        # if conflicts:
-        #     return False
+        conflicts = self.existing_events(meeting_start)
+        if conflicts:
+            logging.info(f"Meeting conflicts found: {conflicts}")
+            return False
         try:
             event = {
                 "summary": "30 minute Consultancy Call",

@@ -28,9 +28,15 @@ END_CALL_FUNCTION = {
     }
 }
 
-CALENDLY_MEETING_MESSAGE_PROMPT = """
-This is the message you will say after setting a meeting. This must contain the meeting information. 
-Maintain a positive and human-like response, and end the message in an enthusiastic way. 
+CALENDLY_MEETING_MESSAGE_PROMPT = """ 
+This is the message you will say after setting a meeting. Always maintain a positive and human-like response. 
+
+You will generate 2 messages separated by the following delimiter: ####.  
+    1. Success message: The message you say when a meeting was set successfully. This must contain the meeting information. 
+    2. Failed message: The message you say when a meeting was not set due to conflicts. You must ask the user for new information. 
+    
+Example: 
+<success_message> #### <failed_message> 
 """
 
 SET_CALENDLY_MEETING_FUNCTION = {

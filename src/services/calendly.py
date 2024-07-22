@@ -70,13 +70,14 @@ class Calendly:
     def set_meeting(self, meeting_start: str, meeting_end: str, customer_name: str) -> bool:
         # Ignore empty inputs
         if meeting_start == "" or meeting_end == "" or customer_name == "":
+            logger.error(f"Failed to set meeting. Meeting information cannot be empty. Meeting Start: {meeting_start}, "
+                         f"Meeting End: {meeting_end}, Customer Name: {customer_name}")
             return False
         # Ignore repeat requests
-        if self.last_recorded_meeting_start == meeting_start:
-            return False
-        if self.last_recorded_meeting_end == meeting_end:
-            return False
-        if self.last_recorded_customer_name == customer_name:
+        if (self.last_recorded_meeting_start == meeting_start and
+                self.last_recorded_meeting_end == meeting_end and
+                self.last_recorded_customer_name == customer_name):
+            logger.error(f"Failed to set meeting. Duplicate requests")
             return False
         self.last_recorded_meeting_start = meeting_start
         self.last_recorded_meeting_end = meeting_end

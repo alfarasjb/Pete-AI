@@ -123,11 +123,16 @@ class LLMClient:
                 meeting_start = func_call['arguments']['meeting_start']
                 meeting_end = func_call['arguments']['meeting_end']
                 customer_name = func_call['arguments']['customer_name']
-                end_call = func_call['arguments']['end_call']
+                # Split the messages
+                success_message, failed_message = func_call['arguments']['message'].split("####")
+                # Check for conflicts
+                conflicts = self.calendly.google.existing_events(meeting_start)
+                message = failed_message if conflicts else success_message
+                # Set the meeting
                 success = self.calendly.set_meeting(meeting_start, meeting_end, customer_name)
                 response = ResponseResponse(
                     response_id=request.response_id,
-                    content=func_call['arguments']['message'],
+                    content=message,
                     content_complete=True,
                     end_call=success
                 )
