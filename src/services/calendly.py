@@ -61,15 +61,16 @@ class Calendly:
 
         print(json.dumps(response.json(), indent=4))
 
-    def set_meeting(self, meeting_date: str, customer_name: str):
+    def set_meeting(self, meeting_date: str, customer_name: str) -> bool:
         # Ignore empty inputs
         if meeting_date == "" or customer_name == "":
-            return
+            return False
         # Ignore repeat requests
         if self.last_recorded_meeting_date == meeting_date:
-            return
+            return False
         if self.last_recorded_customer_name == customer_name:
-            return
+            return False
         self.last_recorded_meeting_date = meeting_date
         self.last_recorded_customer_name = customer_name
         print(f"Setting calendly meeting for: {customer_name} on {meeting_date}")
+        return True

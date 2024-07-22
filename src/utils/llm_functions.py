@@ -1,11 +1,14 @@
 
 # TODO
 # Note: Just stick to JSON. It's simpler, and structure is more visible.
+END_CALL_PROMPT = """
+Ends the call. 
+"""
 END_CALL_FUNCTION = {
     "type": "function",
     "function": {
         "name": "end_call",
-        "description": "End the call if the customer explicitly requests it, or if they have no other concerns/queries.",
+        "description": END_CALL_PROMPT,
         "parameters": {
             "type": "object",
             "properties": {
@@ -18,6 +21,12 @@ END_CALL_FUNCTION = {
         }
     }
 }
+
+CALENDLY_MEETING_MESSAGE_PROMPT = """
+This is the message you will say after setting a meeting. This must contain the meeting information. 
+Maintain a positive and human-like response, and end the message in an enthusiastic way. 
+"""
+
 SET_CALENDLY_MEETING_FUNCTION = {
     "type": "function",
     "function": {
@@ -28,7 +37,7 @@ SET_CALENDLY_MEETING_FUNCTION = {
             "properties": {
                 "message": {
                     "type": "string",
-                    "description": "Friendly acknowledgement message that the meeting is set on the requested schedule. Ask a follow-up question if the customer has any more concerns."
+                    "description": CALENDLY_MEETING_MESSAGE_PROMPT,
                 },
                 "meeting_date": {
                     "type": "string",
@@ -37,9 +46,13 @@ SET_CALENDLY_MEETING_FUNCTION = {
                 "customer_name": {
                     "type": "string",
                     "description": "The name of the customer setting the meeting. The name of the customer has to be a proper noun, and a valid name. It cannot be any arbitrary placeholder such as `Customer` or `Customer Name` or `User`"
+                },
+                "end_call": {
+                    "type": "boolean",
+                    "description": "Boolean to determine if the call is finished. If the customer has no other concerns, set this as True."
                 }
             },
-            "required": ["message", "meeting_date", "customer_name"]
+            "required": ["message", "meeting_date", "customer_name", "end_call"]
         }
     }
 }

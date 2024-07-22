@@ -106,6 +106,7 @@ class LLMClient:
                 yield response
 
         if func_call:
+            print(f"Func Call: {func_call}")
             # TODO: Improve validation
             # TODO: Add validation if function does not exist
             if func_call['func_name'] == 'end_call':
@@ -121,13 +122,14 @@ class LLMClient:
                 func_call['arguments'] = json.loads(func_arguments)
                 meeting_date = func_call['arguments']['meeting_date']
                 customer_name = func_call['arguments']['customer_name']
-                self.calendly.set_meeting(meeting_date, customer_name)
+                end_call = func_call['arguments']['end_call']
+                meeting = self.calendly.set_meeting(meeting_date, customer_name)
 
                 response = ResponseResponse(
                     response_id=request.response_id,
                     content=func_call['arguments']['message'],
                     content_complete=True,
-                    end_call=False
+                    end_call=meeting
                 )
                 yield response
             else:
