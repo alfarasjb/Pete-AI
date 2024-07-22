@@ -120,16 +120,21 @@ class LLMClient:
                 yield response
             elif func_call['func_name'] == 'set_calendly_meeting':
                 func_call['arguments'] = json.loads(func_arguments)
-                meeting_date = func_call['arguments']['meeting_date']
+                meeting_start = func_call['arguments']['meeting_start']
+                meeting_end = func_call['arguments']['meeting_end']
                 customer_name = func_call['arguments']['customer_name']
-                end_call = func_call['arguments']['end_call']
-                meeting = self.calendly.set_meeting(meeting_date, customer_name)
-
+                # Split the messages
+                success_message, failed_message = func_call['arguments']['message'].split("####")
+                # Check for conflicts
+                conflicts = self.calendly.google.existing_events(meeting_start)
+                message = failed_message if conflicts else success_message
+                # Set the meeting
+                success = self.calendly.set_meeting(meeting_start, meeting_end, customer_name)
                 response = ResponseResponse(
                     response_id=request.response_id,
-                    content=func_call['arguments']['message'],
+                    content=message,
                     content_complete=True,
-                    end_call=meeting
+                    end_call=success
                 )
                 yield response
             else:
