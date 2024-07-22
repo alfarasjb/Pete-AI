@@ -86,6 +86,7 @@ With your virtual environment activated, install the required Python packages us
   - `OPENAI_API_KEY=your-openai-api-key` 
   - `RETELL_API_KEY=your-retell-api-key`
   - `RETELL_AGENT_ID=your-retell-agent-id`
+  - `CALENDLY_API_KEY=your-calendly-api-key`
 
 #### Obtain and Set Up ngrok
 
