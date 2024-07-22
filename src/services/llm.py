@@ -5,13 +5,13 @@ from openai import AsyncOpenAI
 
 from src.definitions.credentials import Credentials, EnvVariables
 from src.prompts.prompts import BEGIN_SENTENCE, SYSTEM_PROMPT
-from src.services.email_sender import send_email
 from src.utils.custom_types import (
     ResponseRequiredRequest,
     ResponseResponse,
     Utterance
 )
-from src.utils.llm_functions import LLMFunctions
+from src.utils.llm_functions import TOOLS
+from src.services.calendly import Calendly
 
 # TODO: Make function calling more robust
 
@@ -19,6 +19,7 @@ from src.utils.llm_functions import LLMFunctions
 class LLMClient:
     def __init__(self):
         self.client = AsyncOpenAI(api_key=Credentials.openai_api_key())
+        self.calendly = Calendly()
 
     @staticmethod
     def draft_begin_message() -> ResponseResponse:
@@ -74,7 +75,7 @@ class LLMClient:
             model=EnvVariables.chat_model(),
             messages=prompt,
             stream=True,
-            tools=LLMFunctions.functions()
+            tools=TOOLS
         )
         async for chunk in stream:
             # Extract the functions
@@ -106,6 +107,7 @@ class LLMClient:
 
         if func_call:
             # TODO: Improve validation
+            # TODO: Add validation if function does not exist
             if func_call['func_name'] == 'end_call':
                 func_call['arguments'] = json.loads(func_arguments)
                 response = ResponseResponse(
@@ -115,20 +117,26 @@ class LLMClient:
                     end_call=True
                 )
                 yield response
-            elif func_call['func_name'] == 'send_inquiry':
+            elif func_call['func_name'] == 'set_calendly_meeting':
                 func_call['arguments'] = json.loads(func_arguments)
+                meeting_date = func_call['arguments']['meeting_date']
+                customer_name = func_call['arguments']['customer_name']
+                self.calendly.set_meeting(meeting_date, customer_name)
+
                 response = ResponseResponse(
                     response_id=request.response_id,
                     content=func_call['arguments']['message'],
                     content_complete=True,
                     end_call=False
                 )
-                is_complete = func_call['arguments']['is_complete']
-                print(f"Is complete: {is_complete}")
-                if int(is_complete):
-                    user_name = func_call['arguments']['user_name']
-                    user_message = func_call['arguments']['user_message']
-                    send_email(name=user_name, message=user_message)
+                yield response
+            else:
+                response = ResponseResponse(
+                    response_id=request.response_id,
+                    content="Sorry, I don't have the capability yet.",
+                    content_complete=True,
+                    end_call=False
+                )
                 yield response
         else:
         # Send final response with "content_complete" set to True to signal completion

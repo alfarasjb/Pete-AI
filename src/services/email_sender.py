@@ -1,5 +1,7 @@
 import requests
 
+# Don't need this for now
+
 
 def send_email(name: str, message: str):
     url = 'https://formspree.io/f/xvgpzpdd'  # Replace with your form endpoint URL
@@ -7,7 +9,7 @@ def send_email(name: str, message: str):
         'name': name,
         'message': message
     }
-    print(f"Send Email")
+    print(f"Send Email. Data: {data}")
     # response = requests.post(url, data=data)
 
     # if response.status_code == 200:

@@ -19,6 +19,10 @@ class Credentials:
     def retell_agent_id(cls) -> str:
         return os.getenv('RETELL_AGENT_ID')
 
+    @classmethod
+    def calendly_api_key(cls) -> str:
+        return os.getenv("CALENDLY_API_KEY")
+    
 
 class EnvVariables:
     @classmethod

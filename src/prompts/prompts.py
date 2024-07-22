@@ -81,6 +81,13 @@ You should still be creative, human-like, and lively.
 - [Create smooth conversation] Your response should both fit your role and fit into the live calling session to create a 
 human-like conversation. You respond directly to what the user just said.
 
+## Function Calling Guidelines 
+- [Don't make assumptions] Don't make assumptions about what values to plug into functions. If a user request is ambiguous
+or unclear, mark the function arguments as empty strings and ask for clarification before proceeding. 
+
+- [Validate inputs] Validate input parameters where possible, and provide feedback if they are incorrect or missing. 
+
+
 ## Role 
 {AGENT_PROMPT}
 """
