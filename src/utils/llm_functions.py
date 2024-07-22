@@ -1,3 +1,9 @@
+from datetime import datetime as dt
+
+import pytz
+
+
+NOW = dt.now(pytz.utc).astimezone(pytz.timezone('Asia/Singapore')).isoformat()
 
 # TODO
 # Note: Just stick to JSON. It's simpler, and structure is more visible.
@@ -31,7 +37,7 @@ SET_CALENDLY_MEETING_FUNCTION = {
     "type": "function",
     "function": {
         "name": "set_calendly_meeting",
-        "description": "Customer request to set a Calendly meeting with PioneerDevAI.",
+        "description": "Customer request to set a 30-minute consultancy meeting with PioneerDevAI.",
         "parameters": {
             "type": "object",
             "properties": {
@@ -39,9 +45,13 @@ SET_CALENDLY_MEETING_FUNCTION = {
                     "type": "string",
                     "description": CALENDLY_MEETING_MESSAGE_PROMPT,
                 },
-                "meeting_date": {
+                "meeting_start": {
                     "type": "string",
-                    "description": "The date and time of the meeting",
+                    "description": f"The start date and time of the meeting in ISO 8601 format for the timezone: Asia/Singapore. This date cannot be earlier than {NOW}.",
+                },
+                "meeting_end": {
+                    "type": "string",
+                    "description": "The end date and time of the meeting in ISO 8601 format. This should be 30 minutes after the start of the meeting."
                 },
                 "customer_name": {
                     "type": "string",
@@ -52,7 +62,7 @@ SET_CALENDLY_MEETING_FUNCTION = {
                     "description": "Boolean to determine if the call is finished. If the customer has no other concerns, set this as True."
                 }
             },
-            "required": ["message", "meeting_date", "customer_name", "end_call"]
+            "required": ["message", "meeting_start", "meeting_end", "customer_name", "end_call"]
         }
     }
 }

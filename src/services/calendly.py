@@ -4,6 +4,7 @@ from typing import Dict, List
 import logging
 
 from src.definitions.credentials import Credentials
+from src.services.google import GoogleAPI
 
 # NOTE: Calendly does not have an endpoint to support scheduling events.
 # Must use a different option
@@ -14,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 class Calendly:
     def __init__(self):
+        self.google = GoogleAPI()
         self._api_key = Credentials.calendly_api_key()
         self.base_url = 'https://api.calendly.com'
         self.headers = {
@@ -22,7 +24,8 @@ class Calendly:
         }
         self.user_uri = self.get_user_uri()
         self.last_recorded_customer_name = ""
-        self.last_recorded_meeting_date = ""
+        self.last_recorded_meeting_start = ""
+        self.last_recorded_meeting_end = ""
 
     def get_user_uri(self):
         endpoint = self.base_url + "/users/me"
@@ -64,16 +67,20 @@ class Calendly:
 
         print(json.dumps(response.json(), indent=4))
 
-    def set_meeting(self, meeting_date: str, customer_name: str) -> bool:
+    def set_meeting(self, meeting_start: str, meeting_end: str, customer_name: str) -> bool:
         # Ignore empty inputs
-        if meeting_date == "" or customer_name == "":
+        if meeting_start == "" or meeting_end == "" or customer_name == "":
             return False
         # Ignore repeat requests
-        if self.last_recorded_meeting_date == meeting_date:
+        if self.last_recorded_meeting_start == meeting_start:
+            return False
+        if self.last_recorded_meeting_end == meeting_end:
             return False
         if self.last_recorded_customer_name == customer_name:
             return False
-        self.last_recorded_meeting_date = meeting_date
+        self.last_recorded_meeting_start = meeting_start
+        self.last_recorded_meeting_end = meeting_end
         self.last_recorded_customer_name = customer_name
-        logger.info(f"Setting calendly meeting for: {customer_name} on {meeting_date}")
-        return True
+        logger.info(f"Setting meeting for: {customer_name} from {meeting_start} to {meeting_end}")
+        return self.google.create_meeting(meeting_start, meeting_end)
+

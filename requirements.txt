@@ -10,3 +10,5 @@ google-apps-meet==0.1.7
 google-auth-httplib2==0.22.0
 google-auth-oauthlib==1.2.1
 google-api-python-client==2.137.0
+pytz==2024.1
+python-dateutil==2.9.0.post0
