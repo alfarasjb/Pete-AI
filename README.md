@@ -88,6 +88,7 @@ With your virtual environment activated, install the required Python packages us
   - `RETELL_API_KEY=your-retell-api-key`
   - `RETELL_AGENT_ID=your-retell-agent-id`
   - `CALENDLY_API_KEY=your-calendly-api-key`
+  - `GOOGLE_TOKEN=your-google-auth-token`
 
 #### Obtain and Set Up ngrok
 
