@@ -1,7 +1,8 @@
-import requests
 import json
-from typing import Dict, List
 import logging
+from typing import Dict, Optional, Any
+
+import requests
 
 from src.definitions.credentials import Credentials
 from src.services.google import GoogleAPI
@@ -28,11 +29,17 @@ class Calendly:
         self.last_recorded_meeting_end = ""
 
     def get_user_uri(self):
+        """
+        Gets user uri. Needed for getting user schedule
+        """
         endpoint = self.base_url + "/users/me"
         response = requests.get(endpoint, headers=self.headers)
         return response.json()['resource']['uri']
 
-    def list_user_availability_schedules(self):
+    def list_user_availability_schedules(self) -> Optional[Dict[str, Any]]:
+        """
+        Gets user availability schedule
+        """
         endpoint = self.base_url + "/user_availability_schedules"
         params = {"user": self.user_uri}
         response = requests.get(endpoint, params=params, headers=self.headers)
@@ -48,9 +55,37 @@ class Calendly:
             # return self.to_readable_schedule(available_schedule, timezone)
             return available_schedule
         else:
-            print("Something went wrong")
+            logger.error(f"Failed to get user availability schedules. Something went wrong.")
 
+    def set_meeting(self, meeting_start: str, meeting_end: str, customer_name: str) -> bool:
+        """
+        Sets a meeting
+        """
+        # Ignore empty inputs
+        if meeting_start == "" or meeting_end == "" or customer_name == "":
+            logger.error(f"Failed to set meeting. Meeting information cannot be empty. Meeting Start: {meeting_start}, "
+                         f"Meeting End: {meeting_end}, Customer Name: {customer_name}")
+            return False
+        # Ignore repeat requests
+        if (self.last_recorded_meeting_start == meeting_start and
+                self.last_recorded_meeting_end == meeting_end and
+                self.last_recorded_customer_name == customer_name):
+            logger.error(f"Failed to set meeting. Duplicate requests found.")
+            return False
+        # Record request so we don't repeat it later.
+        self.last_recorded_meeting_start = meeting_start
+        self.last_recorded_meeting_end = meeting_end
+        self.last_recorded_customer_name = customer_name
+        logger.info(f"Setting meeting for: {customer_name} from {meeting_start} to {meeting_end}")
+        return self.google.create_meeting(meeting_start, meeting_end)
+
+    """ 
+    Helper 
+    """
     def to_readable_schedule(self, schedule: Dict[str, any], timezone: str):
+        """
+        Converts to readable schedule
+        """
         schedules = [f"Timezone: {timezone}"]
         for day, times in schedule.items():
             schedules.append(day)
@@ -66,22 +101,3 @@ class Calendly:
             event_uri = response.json()['collection'][0]['uri']
 
         print(json.dumps(response.json(), indent=4))
-
-    def set_meeting(self, meeting_start: str, meeting_end: str, customer_name: str) -> bool:
-        # Ignore empty inputs
-        if meeting_start == "" or meeting_end == "" or customer_name == "":
-            logger.error(f"Failed to set meeting. Meeting information cannot be empty. Meeting Start: {meeting_start}, "
-                         f"Meeting End: {meeting_end}, Customer Name: {customer_name}")
-            return False
-        # Ignore repeat requests
-        if (self.last_recorded_meeting_start == meeting_start and
-                self.last_recorded_meeting_end == meeting_end and
-                self.last_recorded_customer_name == customer_name):
-            logger.error(f"Failed to set meeting. Duplicate requests")
-            return False
-        self.last_recorded_meeting_start = meeting_start
-        self.last_recorded_meeting_end = meeting_end
-        self.last_recorded_customer_name = customer_name
-        logger.info(f"Setting meeting for: {customer_name} from {meeting_start} to {meeting_end}")
-        return self.google.create_meeting(meeting_start, meeting_end)
-

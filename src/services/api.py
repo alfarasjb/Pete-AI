@@ -102,11 +102,11 @@ async def websocket_handler(websocket: WebSocket, call_id: str):
         async for data in websocket.iter_json():
             asyncio.create_task(handle_message(data))
 
-    except WebSocketDisconnect:
-        logger.error(f"LLM WebSocket disconnected for {call_id}")
+    except WebSocketDisconnect as e:
+        logger.error(f"Agent API Error: LLM WebSocket disconnected for {call_id}. Error: {e}")
     except ConnectionTimeoutError as e:
-        logger.error(f"Connection timeout error for {call_id}")
+        logger.error(f"Agent API Error: Connection timeout error for {call_id}. Error: {e}")
     except Exception as e:
-        logger.error(f"Error in LLM WebSocket: {e} for {call_id}")
+        logger.error(f"Agent API Error: Error in LLM WebSocket: {e} for {call_id}. Error: {e}")
     finally:
         logger.info(f"LLM WebSocket connection closed for {call_id}")

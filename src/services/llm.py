@@ -106,7 +106,6 @@ class LLMClient:
                 yield response
 
         if func_call:
-            print(f"Func Call: {func_call}")
             # TODO: Improve validation
             # TODO: Add validation if function does not exist
             if func_call['func_name'] == 'end_call':
@@ -138,7 +137,6 @@ class LLMClient:
         meeting_end = arguments['meeting_end']
         customer_name = arguments['customer_name']
         # Split the message
-        print(arguments['message'])
         ack_message, success_message, conflict_message, error_message = arguments['message'].split("####")
         # Acknowledge Request
         ack_response = ResponseResponse(
