@@ -119,32 +119,10 @@ class LLMClient:
                 )
                 yield response
             elif func_call['func_name'] == 'set_calendly_meeting':
-                func_call['arguments'] = json.loads(func_arguments)
-                meeting_start = func_call['arguments']['meeting_start']
-                meeting_end = func_call['arguments']['meeting_end']
-                customer_name = func_call['arguments']['customer_name']
-                # Split the messages
-                success_message, failed_message = func_call['arguments']['message'].split("####")
-                # Check for conflicts
-                conflicts = self.calendly.google.existing_events(meeting_start)
-                message = failed_message if conflicts else success_message
-                # Set the meeting
-                success = self.calendly.set_meeting(meeting_start, meeting_end, customer_name)
-                response = ResponseResponse(
-                    response_id=request.response_id,
-                    content=message,
-                    content_complete=True,
-                    end_call=success
-                )
-                yield response
-            else:
-                response = ResponseResponse(
-                    response_id=request.response_id,
-                    content="Sorry, I don't have the capability yet.",
-                    content_complete=True,
-                    end_call=False
-                )
-                yield response
+                arguments = json.loads(func_arguments)
+                async for response in self.handle_calendly_meeting(request, arguments):
+                    yield response
+
         else:
         # Send final response with "content_complete" set to True to signal completion
             response = ResponseResponse(
@@ -152,5 +130,41 @@ class LLMClient:
                 content="",
                 content_complete=True,
                 end_call=False,
+            )
+            yield response
+
+    async def handle_calendly_meeting(self, request: ResponseRequiredRequest, arguments: Dict[str, any],):
+        meeting_start = arguments['meeting_start']
+        meeting_end = arguments['meeting_end']
+        customer_name = arguments['customer_name']
+        # Split the message
+        print(arguments['message'])
+        ack_message, success_message, conflict_message, error_message = arguments['message'].split("####")
+        # Acknowledge Request
+        ack_response = ResponseResponse(
+            response_id=request.response_id,
+            content=ack_message,
+            content_complete=True,
+            end_call=False
+        )
+        yield ack_response
+        # Check for conflicts
+        conflicts = self.calendly.google.existing_events(meeting_start)
+        if conflicts:
+            yield ResponseResponse(
+                response_id=request.response_id,
+                content=conflict_message,
+                content_complete=True,
+                end_call=False
+            )
+        # Set the meeting
+        else:
+            success = self.calendly.set_meeting(meeting_start, meeting_end, customer_name)
+            response_message = success_message if success else error_message
+            response = ResponseResponse(
+                response_id=request.response_id,
+                content=response_message,
+                content_complete=True,
+                end_call=success
             )
             yield response
