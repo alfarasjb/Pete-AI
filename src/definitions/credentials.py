@@ -32,3 +32,7 @@ class EnvVariables:
     @classmethod
     def chat_model(cls) -> str:
         return os.getenv("CHAT_MODEL", "gpt-4o")
+
+    @classmethod
+    def database_url(cls) -> str:
+        return os.getenv("DATABASE_URL", "postgresql://myuser:mysecretpassword@localhost:5432/food-beverage-db")

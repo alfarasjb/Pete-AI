@@ -1,4 +1,5 @@
 import json
+import logging
 from typing import List, Dict
 
 from openai import AsyncOpenAI
@@ -15,10 +16,14 @@ from src.services.calendly import Calendly
 
 # TODO: Make function calling more robust
 
+logger = logging.getLogger(__name__)
+
 
 class LLMClient:
     def __init__(self):
         self.client = AsyncOpenAI(api_key=Credentials.openai_api_key())
+        self.chat_model = EnvVariables.chat_model()
+        logger.info(f"Creating LLM Client. Model: {self.chat_model}")
         self.calendly = Calendly()
 
     @staticmethod
@@ -72,7 +77,7 @@ class LLMClient:
         func_arguments = ""
 
         stream = await self.client.chat.completions.create(
-            model=EnvVariables.chat_model(),
+            model=self.chat_model,
             messages=prompt,
             stream=True,
             tools=TOOLS

@@ -10,12 +10,17 @@ from retell import Retell
 from src.definitions.credentials import Credentials
 from src.services.llm import LLMClient
 from src.utils.custom_types import ConfigResponse, ResponseRequiredRequest
+from src.server.routes import db
 
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
 RETELL = Retell(api_key=Credentials.retell_api_key())
 
+
+@app.get("/")
+def default():
+    return JSONResponse(status_code=200, content={"message": "Success"})
 
 @app.post("/webhook")
 async def handle_webhook(request):
@@ -110,3 +115,10 @@ async def websocket_handler(websocket: WebSocket, call_id: str):
         logger.error(f"Error in LLM WebSocket: {e} for {call_id}")
     finally:
         logger.info(f"LLM WebSocket connection closed for {call_id}")
+
+
+""" 
+Router prefix 
+"""
+DB = "/db"
+app.include_router(db.db_router, prefix=DB)
