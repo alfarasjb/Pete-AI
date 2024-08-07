@@ -77,6 +77,42 @@ With your virtual environment activated, install the required Python packages us
     - Using ngrok: `wss://abcd-12-34-56-789.ngrok.io/llm-websocket` (See **Obtain and Set Up ngrok**) 
     - Using fly: `wss://pete-ai.fly.dev/llm-websocket`
 
+#### Settng Up Calendly API 
+- Login to your [Calendly](https://calendly.com) account. 
+- On the left-hand navigation panel, select `Integration & apps` 
+- In the `All integrations` section, select `API and webhooks` 
+- Click `Generate New Token` 
+- Enter a name for your token
+- Click on `Copy Token`. This will be the environment variable: `CALENDLY_API_KEY`
+
+#### Setting Up Google API  
+- Create a new project
+  - Navigate to your [Google Cloud Console](https://console.cloud.google.com)  
+  - On the upper taskbar, next to the Google Cloud icon on the left-hand side, click the dropdown menu. 
+  - On the upper right-hand corner, click `New Project`, and create a new project. 
+  - Navigate to your project's dashboard by clicking the project name on the home page.
+    - You can find this in the section under your name. With the text: `You're working on project <your-project-name>`
+- Enable Google Calendar API 
+  - On the project dashboard, select `APIs & Services` on the left-hand panel.  
+  - On the search bar, search for `Google Calendar`. Select `Google Calendar API` then click `Enable` 
+  - Navigate back to your project's dashboard, then select `APIs & Services`, then select `Credentials` 
+  - On the upper taskbar, click `CREATE CREDENTIALS` then select `OAuth client ID` 
+    - Select `External`, then enter relevant information for your app such as `App Name`, and your `Email`
+    - In the `Scopes` tab, select `ADD OR REMOVE SCOPES`, then select the ff scopes:
+      - `.../auth/userninfo.email`
+      - `.../auth/userinfo.profile`
+      - `openid` 
+    - In the `Test users` tab, select `ADD USERS`, here you can add email addresses for test users. 
+    - Click `Next and Continue` then `Back To Dashboard` 
+  - On the left-hand navigation panel, navigate to `Credentials`, then click `CREATE CREDENTIALS` then select `OAuth client ID`. 
+    - Select `Desktop app` as application type. 
+    - A popup window will appear, confirming OAuth client has been created. In the popup window, click on `DOWNLOAD JSON`
+    - Rename this file to `credentials.json`, and move it to the `scripts` folder in your project directory. 
+- Generating the Token 
+  - Run the file `scripts/create_google_token.py`. This will create a `token.json` file. 
+  - You will be redirected to google. Authenticate with your email, then click `Continue`
+  - Copy the contents, this will be the value of the environment variable `GOOGLE_TOKEN`
+
 #### Set Up Environment Variables
 
 - Copy the `.env.example` file to create a `.env` file:
@@ -88,7 +124,7 @@ With your virtual environment activated, install the required Python packages us
   - `RETELL_API_KEY=your-retell-api-key`
   - `RETELL_AGENT_ID=your-retell-agent-id`
   - `CALENDLY_API_KEY=your-calendly-api-key`
-  - `GOOGLE_TOKEN=your-google-auth-token`
+  - `GOOGLE_TOKEN=your-google-token`
 
 #### Obtain and Set Up ngrok
 
